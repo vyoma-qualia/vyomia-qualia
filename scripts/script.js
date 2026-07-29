@@ -2,6 +2,8 @@
   const hero = document.querySelector('.hero');
   const logo = document.getElementById('heroLogo');
   const spriteField = document.querySelector('.sprite-field');
+  const orbitField = document.querySelector('.orbit-field');
+  const buffer = document.querySelector('.cbuffer');
 
   function updateHeroReveal(){
     if (!hero || !logo) return;
@@ -13,6 +15,10 @@
     logo.style.opacity = String(0.08 + progress * 0.92);
     logo.style.transform = `translateY(${(1 - progress) * 48}px) scale(${0.95 + progress * 0.05})`;
     logo.style.filter = `brightness(${0.06 + progress * 0.94})`;
+
+    if (buffer) {
+      buffer.style.transform = `translateY(${Math.max(16, 42 - progress * 26)}px)`;
+    }
   }
 
   function createSprites(){
@@ -61,12 +67,25 @@
     });
   }
 
+  function createOrbitDots(){
+    if (!orbitField) return;
+    orbitField.innerHTML = '';
+    for (let i = 0; i < 16; i += 1) {
+      const dot = document.createElement('span');
+      dot.className = 'orbit-dot';
+      dot.style.animationDelay = `${i * 0.2}s`;
+      dot.style.opacity = String(0.2 + (i % 4) * 0.16);
+      orbitField.appendChild(dot);
+    }
+  }
+
   window.addEventListener('scroll', updateHeroReveal, { passive: true });
   window.addEventListener('resize', updateHeroReveal);
   window.addEventListener('pointermove', updateSprites, { passive: true });
   window.addEventListener('pointerleave', () => updateSprites(null), { passive: true });
 
   createSprites();
+  createOrbitDots();
   updateHeroReveal();
   updateSprites(null);
 })();

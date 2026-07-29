@@ -32,8 +32,19 @@ body{
 .logo-stage{display:flex;align-items:center;justify-content:center;width:min(74vw, 460px);max-width:460px}
 .hero-logo{display:block;width:100%;height:auto;max-width:360px;object-fit:contain;opacity:0;transform:translateY(48px) scale(0.95);filter:brightness(0);transition:opacity .35s ease, transform .35s ease, filter .35s ease}
 
-.buffer-wrap{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;padding:2rem 0 6vh;}
-.cbuffer{width:20vmin;max-width:100px;height:auto;display:block;opacity:0.9}
+.buffer-wrap{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;padding:2rem 0 10vh;min-height:28vh;margin-top:2rem;}
+.cbuffer{width:26vmin;max-width:130px;height:auto;display:block;opacity:0.9;transform:translateY(42px);transition:transform 200ms ease-out}
+
+.orbit-field{position:absolute;inset:0;pointer-events:none;overflow:visible}
+.orbit-dot{position:absolute;left:50%;top:50%;width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,0.75);animation:orbitDescend 5s linear infinite;transform-origin:center center;opacity:0.7}
+
+@keyframes orbitDescend{
+  0%{transform:translate(-50%, -50%) rotate(0deg) translateX(0px) translateY(0px);opacity:0.2}
+  25%{transform:translate(-50%, -50%) rotate(90deg) translateX(60px) translateY(-20px);opacity:0.55}
+  50%{transform:translate(-50%, -50%) rotate(180deg) translateX(120px) translateY(0px);opacity:0.9}
+  75%{transform:translate(-50%, -50%) rotate(270deg) translateX(180px) translateY(20px);opacity:0.55}
+  100%{transform:translate(-50%, -50%) rotate(360deg) translateX(240px) translateY(40px);opacity:0.2}
+}
 
 .effect-layer{position:absolute;inset:0;pointer-events:none;z-index:1;overflow:visible}
 .sprite-field{position:absolute;inset:0}
