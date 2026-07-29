@@ -26,15 +26,20 @@ body{
 }
 
 .site-header{
+  position:relative;
   display:flex;
   align-items:center;
-  justify-content:space-between;
+  justify-content:center;
   padding:1rem 1.5rem;
   background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
 }
-.title{font-weight:600;letter-spacing:0.06em;margin:0}
+.title{font-weight:600;letter-spacing:0.06em;margin:0;text-align:center}
 
 .theme-toggle{
+  position:absolute;
+  right:1.5rem;
+  top:50%;
+  transform:translateY(-50%);
   background:transparent;
   border:1px solid var(--muted);
   color:var(--text);
