@@ -49,9 +49,10 @@ body{
   font-size:0.9rem;
 }
 
-.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:space-between}
-.hero-inner{padding:3.5rem 1.5rem;text-align:center}
-.tagline{margin:0;font-size:1.15rem;color:var(--muted)}
+.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden}
+.hero-inner{flex:1;display:flex;align-items:center;justify-content:center;padding:3.5rem 1.5rem 2rem;text-align:center}
+.logo-stage{display:flex;align-items:center;justify-content:center;width:min(70vw, 420px);max-width:420px}
+.hero-logo{display:block;width:100%;height:auto;max-width:360px;object-fit:contain;opacity:0;transform:translateY(48px) scale(0.95);filter:brightness(0);transition:opacity .35s ease, transform .35s ease, filter .35s ease}
 
 .buffer-wrap{display:flex;align-items:center;justify-content:center;padding:2rem 0 6vh;}
 .cbuffer{width:60vmin;max-width:540px;height:auto;display:block}
@@ -81,7 +82,7 @@ body{
 
 /* reduced motion respect */
 @media (prefers-reduced-motion: reduce){
-  .ring--1,.ring--2,.ring--3,.ring--4{animation:none}
+  .ring--1,.ring--2,.ring--3,.ring--4,.hero-logo{animation:none;transition:none}
 }
 
 /* small screens */
