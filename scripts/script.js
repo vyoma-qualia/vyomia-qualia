@@ -18,7 +18,7 @@
   function createSprites(){
     if (!spriteField) return;
 
-    const spriteCount = 42;
+    const spriteCount = 24;
     for (let i = 0; i < spriteCount; i += 1) {
       const sprite = document.createElement('div');
       sprite.className = 'sprite';
@@ -51,8 +51,8 @@
       const driftX = baseX - spriteX;
       const driftY = baseY - spriteY;
 
-      const moveX = (dx / distance) * force * 16 + driftX * 0.005;
-      const moveY = (dy / distance) * force * 16 + driftY * 0.005;
+      const moveX = (dx / distance) * force * 8 + driftX * 0.0025;
+      const moveY = (dy / distance) * force * 8 + driftY * 0.0025;
       const angle = (index % 2 === 0 ? 1 : -1) * (0.5 + force * 0.6);
 
       sprite.style.transform = `translate(${moveX}px, ${moveY}px) rotate(${angle}deg)`;

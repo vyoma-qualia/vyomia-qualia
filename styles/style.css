@@ -37,17 +37,17 @@ body{
 
 .effect-layer{position:absolute;inset:0;pointer-events:none;z-index:1;overflow:hidden}
 .sprite-field{position:absolute;inset:0}
-.sprite{position:absolute;width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.9);box-shadow:0 0 8px rgba(255,255,255,0.35);transition:transform 160ms ease-out, opacity 160ms ease-out}
-.sprite.is-repel{background:rgba(255,255,255,0.55)}
-.sprite.is-attract{background:rgba(255,255,255,0.95);transform:scale(1.4)}
+.sprite{position:absolute;width:3px;height:3px;border-radius:50%;background:rgba(255,255,255,0.55);box-shadow:0 0 4px rgba(255,255,255,0.12);transition:transform 220ms ease-out, opacity 220ms ease-out}
+.sprite.is-repel{background:rgba(255,255,255,0.28)}
+.sprite.is-attract{background:rgba(255,255,255,0.72);transform:scale(1.15)}
 
-.corner-dot{position:absolute;width:5px;height:5px;border-radius:50%;background:white;opacity:0.75;animation:cornerPulse 2.8s ease-in-out infinite}
+.corner-dot{position:absolute;width:3px;height:3px;border-radius:50%;background:white;opacity:0.4;animation:cornerPulse 3.6s ease-in-out infinite}
 .corner-dot--top-left{top:18px;left:18px;animation-delay:0s}
-.corner-dot--top-right{top:18px;right:18px;animation-delay:0.8s}
-.corner-dot--bottom-left{bottom:18px;left:18px;animation-delay:1.4s}
-.corner-dot--bottom-right{bottom:18px;right:18px;animation-delay:2.1s}
+.corner-dot--top-right{top:18px;right:18px;animation-delay:0.9s}
+.corner-dot--bottom-left{bottom:18px;left:18px;animation-delay:1.8s}
+.corner-dot--bottom-right{bottom:18px;right:18px;animation-delay:2.7s}
 
-@keyframes cornerPulse{0%,100%{transform:scale(0.8);opacity:0.3}50%{transform:scale(1.2);opacity:0.95}}
+@keyframes cornerPulse{0%,100%{transform:scale(0.7);opacity:0.15}50%{transform:scale(1);opacity:0.45}}
 
 /* reduced motion respect */
 @media (prefers-reduced-motion: reduce){
