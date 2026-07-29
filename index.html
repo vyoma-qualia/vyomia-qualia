@@ -7,9 +7,7 @@
   <link rel="stylesheet" href="styles/style.css">
 </head>
 <body data-theme="dark">
-  <header class="site-header">
-    <h1 class="title">vyomia qualia</h1>
-  </header>
+  <header class="site-header" aria-hidden="true"></header>
 
   <main class="hero">
     <section class="hero-inner">
@@ -19,16 +17,7 @@
     </section>
 
     <section class="buffer-wrap">
-      <!-- Animated circular buffer SVG -->
-      <svg class="cbuffer" viewBox="0 0 200 200" aria-hidden="true" role="img">
-        <g transform="translate(100,100)">
-          <circle class="ring ring--bg" r="80" />
-          <circle class="ring ring--1" r="64" />
-          <circle class="ring ring--2" r="48" />
-          <circle class="ring ring--3" r="32" />
-          <circle class="ring ring--4" r="16" />
-        </g>
-      </svg>
+      <img class="cbuffer" src="assets/loading-buffer-svgrepo-com.svg" alt="Loading buffer" />
     </section>
   </main>
 

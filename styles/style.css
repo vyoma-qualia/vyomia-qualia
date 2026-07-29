@@ -23,9 +23,8 @@ body{
   align-items:center;
   justify-content:center;
   padding:1rem 1.5rem;
-  background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+  min-height:2.5rem;
 }
-.title{font-weight:600;letter-spacing:0.06em;margin:0;text-align:center}
 
 .hero{min-height:100vh;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden}
 .hero-inner{flex:1;display:flex;align-items:center;justify-content:center;padding:3.5rem 1.5rem 2rem;text-align:center}
@@ -33,29 +32,11 @@ body{
 .hero-logo{display:block;width:100%;height:auto;max-width:360px;object-fit:contain;opacity:0;transform:translateY(48px) scale(0.95);filter:brightness(0);transition:opacity .35s ease, transform .35s ease, filter .35s ease}
 
 .buffer-wrap{display:flex;align-items:center;justify-content:center;padding:2rem 0 6vh;}
-.cbuffer{width:60vmin;max-width:540px;height:auto;display:block}
-
-.ring{fill:none;stroke-linecap:round;}
-.ring--bg{stroke:rgba(255,255,255,0.08);stroke-width:12}
-.ring--1{stroke:rgba(255,255,255,0.95);stroke-width:2;stroke-dasharray:6 140;}
-.ring--2{stroke:rgba(255,255,255,0.65);stroke-width:2;stroke-dasharray:4 120;}
-.ring--3{stroke:rgba(255,255,255,0.4);stroke-width:2;stroke-dasharray:3 100;}
-.ring--4{stroke:rgba(255,255,255,0.2);stroke-width:2;stroke-dasharray:2 80;}
-
-/* Animations */
-.ring--1{animation:orbit1 8s linear infinite; transform-origin:100px 100px}
-.ring--2{animation:orbit2 10s linear infinite reverse; transform-origin:100px 100px}
-.ring--3{animation:orbit3 12s linear infinite; transform-origin:100px 100px}
-.ring--4{animation:orbit4 14s linear infinite reverse; transform-origin:100px 100px}
-
-@keyframes orbit1{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-@keyframes orbit2{from{transform:rotate(360deg)}to{transform:rotate(0deg)}}
-@keyframes orbit3{from{transform:rotate(0deg)}to{transform:rotate(-360deg)}}
-@keyframes orbit4{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.cbuffer{width:60vmin;max-width:300px;height:auto;display:block;opacity:0.9}
 
 /* reduced motion respect */
 @media (prefers-reduced-motion: reduce){
-  .ring--1,.ring--2,.ring--3,.ring--4,.hero-logo{animation:none;transition:none}
+  .hero-logo{transition:none}
 }
 
 /* small screens */
