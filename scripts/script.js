@@ -18,7 +18,7 @@
   function createSprites(){
     if (!spriteField) return;
 
-    const spriteCount = 24;
+    const spriteCount = 72;
     for (let i = 0; i < spriteCount; i += 1) {
       const sprite = document.createElement('div');
       sprite.className = 'sprite';
@@ -44,15 +44,15 @@
       const dx = pointerX - spriteX;
       const dy = pointerY - spriteY;
       const distance = Math.max(80, Math.hypot(dx, dy));
-      const force = Math.max(0, 1 - distance / 220);
+      const force = Math.max(0, 1 - distance / 180);
 
       const baseX = parseFloat(sprite.dataset.baseX || '0') * window.innerWidth;
       const baseY = parseFloat(sprite.dataset.baseY || '0') * window.innerHeight;
       const driftX = baseX - spriteX;
       const driftY = baseY - spriteY;
 
-      const moveX = (dx / distance) * force * 8 + driftX * 0.0025;
-      const moveY = (dy / distance) * force * 8 + driftY * 0.0025;
+      const moveX = (dx / distance) * force * 18 + driftX * 0.005;
+      const moveY = (dy / distance) * force * 18 + driftY * 0.005;
       const angle = (index % 2 === 0 ? 1 : -1) * (0.5 + force * 0.6);
 
       sprite.style.transform = `translate(${moveX}px, ${moveY}px) rotate(${angle}deg)`;

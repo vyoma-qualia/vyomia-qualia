@@ -33,13 +33,13 @@ body{
 .hero-logo{display:block;width:100%;height:auto;max-width:360px;object-fit:contain;opacity:0;transform:translateY(48px) scale(0.95);filter:brightness(0);transition:opacity .35s ease, transform .35s ease, filter .35s ease}
 
 .buffer-wrap{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;padding:2rem 0 6vh;}
-.cbuffer{width:60vmin;max-width:300px;height:auto;display:block;opacity:0.9}
+.cbuffer{width:20vmin;max-width:100px;height:auto;display:block;opacity:0.9}
 
 .effect-layer{position:absolute;inset:0;pointer-events:none;z-index:1;overflow:visible}
 .sprite-field{position:absolute;inset:0}
-.sprite{position:absolute;width:3px;height:3px;border-radius:50%;background:rgba(255,255,255,0.55);box-shadow:0 0 4px rgba(255,255,255,0.12);transition:transform 220ms ease-out, opacity 220ms ease-out}
-.sprite.is-repel{background:rgba(255,255,255,0.28)}
-.sprite.is-attract{background:rgba(255,255,255,0.72);transform:scale(1.15)}
+.sprite{position:absolute;width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,0.75);box-shadow:0 0 6px rgba(255,255,255,0.2);transition:transform 180ms ease-out, opacity 180ms ease-out}
+.sprite.is-repel{background:rgba(255,255,255,0.4)}
+.sprite.is-attract{background:rgba(255,255,255,0.95);transform:scale(1.35)}
 
 .corner-dot{position:absolute;width:3px;height:3px;border-radius:50%;background:white;opacity:0.4;animation:cornerPulse 3.6s ease-in-out infinite}
 .corner-dot--top-left{top:18px;left:18px;animation-delay:0s}
