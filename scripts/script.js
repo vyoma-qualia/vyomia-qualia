@@ -23,7 +23,7 @@
     logo.style.transform = `translateY(${(1 - progress) * 48}px) scale(${0.95 + progress * 0.05})`;
     logo.style.filter = `brightness(${0.06 + progress * 0.94})`;
 
-    body.style.background = `linear-gradient(180deg, #070707 0%, rgba(7,7,7,${1 - progress}) 50%, rgba(255,255,255,${progress}) 100%)`;
+    body.style.background = `linear-gradient(180deg, #000000 0%, rgba(0,0,0,${1 - progress}) 50%, rgba(255,255,255,${progress}) 100%)`;
   }
 
   if (toggle) {
