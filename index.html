@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>vyomia qualia</title>
+  <link rel="stylesheet" href="styles/style.css">
+</head>
+<body data-theme="dark">
+  <header class="site-header">
+    <h1 class="title">vyomia qualia</h1>
+    <button id="themeToggle" class="theme-toggle" aria-pressed="false">Toggle Theme</button>
+  </header>
+
+  <main class="hero">
+    <section class="hero-inner">
+      <p class="tagline">A highly monochrome experience — minimal midtones.</p>
+    </section>
+
+    <section class="buffer-wrap">
+      <!-- Animated circular buffer SVG -->
+      <svg class="cbuffer" viewBox="0 0 200 200" aria-hidden="true" role="img">
+        <g transform="translate(100,100)">
+          <circle class="ring ring--bg" r="80" />
+          <circle class="ring ring--1" r="64" />
+          <circle class="ring ring--2" r="48" />
+          <circle class="ring ring--3" r="32" />
+          <circle class="ring ring--4" r="16" />
+        </g>
+      </svg>
+    </section>
+  </main>
+
+  <script src="scripts/script.js"></script>
+</body>
+</html>
