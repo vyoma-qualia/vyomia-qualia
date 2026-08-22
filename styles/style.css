@@ -32,7 +32,13 @@ body{
 .logo-stage{display:flex;align-items:center;justify-content:center;width:min(74vw, 460px);max-width:460px}
 .hero-logo{display:block;width:100%;height:auto;max-width:360px;object-fit:contain;opacity:0;transform:translateY(48px) scale(0.95);filter:brightness(0);transition:opacity .35s ease, transform .35s ease, filter .35s ease}
 
-.cbuffer{width:20vmin;max-width:100px;height:auto;display:block;opacity:0.9}
+.buffer-wrap{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:clamp(2rem, 7vh, 4.5rem);padding:2rem 0 8vh;min-height:52vh}
+.orbit-system{position:relative;width:min(82vw, 430px);aspect-ratio:1;display:grid;place-items:center}
+.cbuffer{position:relative;z-index:2;width:26vmin;max-width:130px;height:auto;display:block;opacity:0.9;transform:translateY(16px);transition:transform 120ms ease-out}
+
+.orbit-field{position:absolute;inset:0;pointer-events:none;overflow:visible}
+.orbit-ring{position:absolute;left:50%;top:50%;border:1px solid rgba(255,255,255,0.16);border-radius:50%;transform:translate(-50%, -50%)}
+.orbit-dot{position:absolute;left:50%;top:50%;width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,0.8);transform-origin:center center;opacity:0.7;box-shadow:0 0 8px rgba(255,255,255,0.22)}
 
 .image-reveal{position:relative;z-index:2;display:flex;justify-content:center;align-items:center;min-height:100vh;padding:8vh 1.5rem}
 .scroll-image{display:block;width:min(88vw, 720px);height:auto;opacity:var(--reveal-progress, 0);transform:translateY(calc((1 - var(--reveal-progress, 0)) * 56px));transition:opacity .12s linear, transform .12s linear}
@@ -54,12 +60,13 @@ body{
 
 /* reduced motion respect */
 @media (prefers-reduced-motion: reduce){
-  .hero-logo,.scroll-image{transition:none}
+  .hero-logo,.scroll-image,.cbuffer{transition:none}
   .image-reveal .scroll-image{opacity:1;transform:none}
 }
 
 /* small screens */
 @media (max-width:520px){
-  .cbuffer{width:86vmin}
+  .orbit-system{width:min(88vw, 360px)}
+  .cbuffer{width:24vmin}
   .title{font-size:1rem}
 }

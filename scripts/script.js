@@ -1,7 +1,10 @@
 (() => {
   const hero = document.querySelector('.hero');
   const logo = document.getElementById('heroLogo');
+  const orbitLogo = document.getElementById('orbitLogo');
   const spriteField = document.querySelector('.sprite-field');
+  const orbitField = document.querySelector('.orbit-field');
+  const buffer = document.querySelector('.cbuffer');
   const revealSections = document.querySelectorAll('.image-reveal');
 
   function updateHeroReveal(){
@@ -14,7 +17,16 @@
     logo.style.opacity = String(0.08 + progress * 0.92);
     logo.style.transform = `translateY(${(1 - progress) * 48}px) scale(${0.95 + progress * 0.05})`;
     logo.style.filter = `brightness(${0.06 + progress * 0.94})`;
+  }
 
+  function updateBufferReveal(){
+    if (!buffer || !orbitLogo) return;
+    const bufferRect = buffer.parentElement.parentElement.getBoundingClientRect();
+    const progress = Math.max(0, Math.min(1, 1 - bufferRect.top / window.innerHeight));
+    buffer.style.transform = `translateY(${Math.max(0, 16 - progress * 10)}px)`;
+    orbitLogo.style.opacity = String(0.08 + progress * 0.92);
+    orbitLogo.style.transform = `translateY(${(1 - progress) * 28}px) scale(${0.95 + progress * 0.05})`;
+    orbitLogo.style.filter = `brightness(${0.06 + progress * 0.94})`;
   }
 
   function updateImageReveals(){
@@ -74,20 +86,78 @@
     });
   }
 
+  const orbitState = { pointerX: 0.5, pointerY: 0.5, lastTime: 0, particles: [] };
+
+  function createOrbitDots(){
+    if (!orbitField) return;
+    const ringCount = 4;
+    const particleCount = 7;
+    for (let ringIndex = 0; ringIndex < ringCount; ringIndex += 1) {
+      const ring = document.createElement('span');
+      ring.className = 'orbit-ring';
+      ring.style.width = `${42 + ringIndex * 18}%`;
+      ring.style.height = ring.style.width;
+      orbitField.appendChild(ring);
+      for (let particleIndex = 0; particleIndex < particleCount; particleIndex += 1) {
+        const dot = document.createElement('span');
+        dot.className = 'orbit-dot';
+        dot.style.opacity = String(0.35 + (particleIndex % 3) * 0.2);
+        orbitField.appendChild(dot);
+        orbitState.particles.push({
+          element: dot,
+          angle: (Math.PI * 2 * particleIndex) / particleCount + ringIndex * 0.4,
+          radius: 21 + ringIndex * 9,
+          speed: (ringIndex % 2 ? -1 : 1) * (0.42 + ringIndex * 0.07),
+        });
+      }
+    }
+  }
+
+  function animateOrbit(time){
+    if (!orbitField) return;
+    const elapsed = orbitState.lastTime ? Math.min(32, time - orbitState.lastTime) / 1000 : 0;
+    orbitState.lastTime = time;
+    const fieldRect = orbitField.getBoundingClientRect();
+    const centerX = fieldRect.left + fieldRect.width / 2;
+    const centerY = fieldRect.top + fieldRect.height / 2;
+    const cursorX = orbitState.pointerX * window.innerWidth;
+    const cursorY = orbitState.pointerY * window.innerHeight;
+    const cursorDistance = Math.hypot(cursorX - centerX, cursorY - centerY);
+    const cursorAngle = Math.atan2(cursorY - centerY, cursorX - centerX);
+    orbitState.particles.forEach((particle) => {
+      const force = Math.max(0, 1 - cursorDistance / 340);
+      particle.angle += (particle.speed + Math.sin(cursorAngle - particle.angle) * force * 0.75) * elapsed;
+      const radius = (particle.radius + Math.sin(cursorAngle - particle.angle) * force * 5) * fieldRect.width / 100;
+      particle.element.style.transform = `translate(-50%, -50%) rotate(${particle.angle}rad) translateX(${radius}px)`;
+    });
+    requestAnimationFrame(animateOrbit);
+  }
+
   window.addEventListener('scroll', () => {
     updateHeroReveal();
+    updateBufferReveal();
     updateImageReveals();
   }, { passive: true });
-  window.addEventListener('resize', updateHeroReveal);
+  window.addEventListener('resize', () => {
+    updateHeroReveal();
+    updateBufferReveal();
+  });
   window.addEventListener('pointermove', (event) => {
+    orbitState.pointerX = event.clientX / window.innerWidth;
+    orbitState.pointerY = event.clientY / window.innerHeight;
     updateSprites(event);
   }, { passive: true });
   window.addEventListener('pointerleave', () => {
+    orbitState.pointerX = 0.5;
+    orbitState.pointerY = 0.5;
     updateSprites(null);
   }, { passive: true });
 
   createSprites();
+  createOrbitDots();
   updateHeroReveal();
+  updateBufferReveal();
   updateImageReveals();
   updateSprites(null);
+  requestAnimationFrame(animateOrbit);
 })();
