@@ -2,8 +2,7 @@
   const hero = document.querySelector('.hero');
   const logo = document.getElementById('heroLogo');
   const spriteField = document.querySelector('.sprite-field');
-  const orbitField = document.querySelector('.orbit-field');
-  const buffer = document.querySelector('.cbuffer');
+  const revealSections = document.querySelectorAll('.image-reveal');
 
   function updateHeroReveal(){
     if (!hero || !logo) return;
@@ -16,9 +15,17 @@
     logo.style.transform = `translateY(${(1 - progress) * 48}px) scale(${0.95 + progress * 0.05})`;
     logo.style.filter = `brightness(${0.06 + progress * 0.94})`;
 
-    if (buffer) {
-      buffer.style.transform = `translateY(${Math.max(16, 42 - progress * 26)}px)`;
-    }
+  }
+
+  function updateImageReveals(){
+    revealSections.forEach((section) => {
+      const sectionRect = section.getBoundingClientRect();
+      const start = window.innerHeight * 0.9;
+      const end = window.innerHeight * 0.2;
+      const progress = Math.max(0, Math.min(1, (start - sectionRect.top) / (start - end)));
+      section.style.setProperty('--reveal-progress', String(progress));
+      section.classList.toggle('is-visible', progress > 0);
+    });
   }
 
   function createSprites(){
@@ -67,25 +74,20 @@
     });
   }
 
-  function createOrbitDots(){
-    if (!orbitField) return;
-    orbitField.innerHTML = '';
-    for (let i = 0; i < 16; i += 1) {
-      const dot = document.createElement('span');
-      dot.className = 'orbit-dot';
-      dot.style.animationDelay = `${i * 0.2}s`;
-      dot.style.opacity = String(0.2 + (i % 4) * 0.16);
-      orbitField.appendChild(dot);
-    }
-  }
-
-  window.addEventListener('scroll', updateHeroReveal, { passive: true });
+  window.addEventListener('scroll', () => {
+    updateHeroReveal();
+    updateImageReveals();
+  }, { passive: true });
   window.addEventListener('resize', updateHeroReveal);
-  window.addEventListener('pointermove', updateSprites, { passive: true });
-  window.addEventListener('pointerleave', () => updateSprites(null), { passive: true });
+  window.addEventListener('pointermove', (event) => {
+    updateSprites(event);
+  }, { passive: true });
+  window.addEventListener('pointerleave', () => {
+    updateSprites(null);
+  }, { passive: true });
 
   createSprites();
-  createOrbitDots();
   updateHeroReveal();
+  updateImageReveals();
   updateSprites(null);
 })();
