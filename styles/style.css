@@ -31,6 +31,7 @@ body{
 .hero-inner{position:relative;z-index:2;flex:1;display:flex;align-items:center;justify-content:center;padding:3.5rem 1.5rem 2rem;text-align:center}
 .logo-stage{display:flex;align-items:center;justify-content:center;width:min(74vw, 460px);max-width:460px}
 .hero-logo{display:block;width:100%;height:auto;max-width:360px;object-fit:contain;opacity:0;transform:translate3d(var(--cursor-x, 0px), calc(var(--logo-reveal-y, 48px) + var(--cursor-y, 0px)), 0) rotate(var(--cursor-rotation, 0deg)) scaleX(var(--cursor-stretch, 1)) scale(var(--logo-scale, 0.95));filter:brightness(0);transition:opacity .35s ease, filter .35s ease;will-change:transform}
+.logo-node{fill:#ffffff;pointer-events:none;filter:drop-shadow(0 0 8px rgba(255,255,255,.7));transition:opacity .18s ease}
 
 .buffer-wrap{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:clamp(2rem, 7vh, 4.5rem);padding:2rem 0 8vh;min-height:52vh}
 .orbit-system{position:relative;width:min(82vw, 430px);aspect-ratio:1;display:grid;place-items:center}

@@ -7,6 +7,7 @@
   const buffer = document.querySelector('.cbuffer');
   const revealSections = document.querySelectorAll('.image-reveal');
   const logoPieces = [];
+  const logoNodes = [];
   const logoMotion = {
     targetX: 0,
     targetY: 0,
@@ -68,6 +69,21 @@
         velocityY: 0,
         rotationVelocity: 0,
       });
+    });
+    logoPieces.forEach((piece, pieceIndex) => {
+      const length = piece.path.getTotalLength();
+      const nodeCount = Math.max(8, Math.min(24, Math.round(length / 420)));
+      for (let nodeIndex = 0; nodeIndex < nodeCount; nodeIndex += 1) {
+        const point = piece.path.getPointAtLength(length * nodeIndex / nodeCount);
+        const node = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        node.setAttribute('class', 'logo-node');
+        node.setAttribute('cx', '0');
+        node.setAttribute('cy', '0');
+        node.setAttribute('r', String(14 + (nodeIndex % 3) * 5));
+        node.style.opacity = '0';
+        logo.appendChild(node);
+        logoNodes.push({ node, piece, x: point.x, y: point.y, phase: pieceIndex * 1.7 + nodeIndex * 0.8 });
+      }
     });
     logoPieces.forEach((piece) => {
       const bounds = piece.path.getBBox();
@@ -242,6 +258,18 @@
       const jitterX = Math.sin(logoMotion.wigglePhase + piece.center.x) * speedJitter;
       const jitterY = Math.cos(logoMotion.wigglePhase + piece.center.y) * speedJitter;
       piece.path.setAttribute('transform', `translate(${piece.x + jitterX} ${piece.y + jitterY}) rotate(${piece.rotation} ${piece.center.x} ${piece.center.y})`);
+    });
+    logoNodes.forEach((nodeData) => {
+      const piece = nodeData.piece;
+      const nodeDistance = Math.hypot(point.x - nodeData.x, point.y - nodeData.y);
+      const nodeDistanceInPixels = nodeDistance * logo.getBoundingClientRect().width / 8000;
+      const nodeForce = Math.max(0, 1 - nodeDistanceInPixels / 180);
+      const nodeJitter = piece.brittle * 38 + nodeForce * 12;
+      const jitterX = Math.sin(logoMotion.wigglePhase * 1.8 + nodeData.phase) * nodeJitter;
+      const jitterY = Math.cos(logoMotion.wigglePhase * 1.5 + nodeData.phase) * nodeJitter;
+      const opacity = Math.min(0.85, piece.brittle * 0.72 + Math.min(1, logoMotion.wiggleAmount / 6) * 0.5);
+      nodeData.node.style.opacity = String(opacity);
+      nodeData.node.setAttribute('transform', `translate(${piece.x + jitterX} ${piece.y + jitterY}) rotate(${piece.rotation} ${piece.center.x} ${piece.center.y}) translate(${nodeData.x} ${nodeData.y})`);
     });
   }
 
