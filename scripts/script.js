@@ -1,11 +1,27 @@
 (() => {
   const hero = document.querySelector('.hero');
   const logo = document.getElementById('heroLogo');
-  const orbitLogo = document.getElementById('orbitLogo');
   const spriteField = document.querySelector('.sprite-field');
   const orbitField = document.querySelector('.orbit-field');
   const buffer = document.querySelector('.cbuffer');
   const revealSections = document.querySelectorAll('.image-reveal');
+  const logoMotion = {
+    targetX: 0,
+    targetY: 0,
+    targetRotation: 0,
+    x: 0,
+    y: 0,
+    rotation: 0,
+    velocityX: 0,
+    velocityY: 0,
+    rotationVelocity: 0,
+    pointerX: window.innerWidth / 2,
+    pointerY: window.innerHeight / 2,
+    lastPointerTime: 0,
+    lastFrameTime: 0,
+    wigglePhase: 0,
+    wiggleAmount: 0,
+  };
 
   function updateHeroReveal(){
     if (!hero || !logo) return;
@@ -15,18 +31,16 @@
     const progress = rawProgress < 0.5 ? rawProgress * rawProgress * 2 : 1 - Math.pow(-2 * rawProgress + 2, 2) / 2;
 
     logo.style.opacity = String(0.08 + progress * 0.92);
-    logo.style.transform = `translateY(${(1 - progress) * 48}px) scale(${0.95 + progress * 0.05})`;
+    logo.style.setProperty('--logo-reveal-y', `${(1 - progress) * 48}px`);
+    logo.style.setProperty('--logo-scale', String(0.95 + progress * 0.05));
     logo.style.filter = `brightness(${0.06 + progress * 0.94})`;
   }
 
   function updateBufferReveal(){
-    if (!buffer || !orbitLogo) return;
+    if (!buffer) return;
     const bufferRect = buffer.parentElement.parentElement.getBoundingClientRect();
     const progress = Math.max(0, Math.min(1, 1 - bufferRect.top / window.innerHeight));
     buffer.style.transform = `translateY(${Math.max(0, 16 - progress * 10)}px)`;
-    orbitLogo.style.opacity = String(0.08 + progress * 0.92);
-    orbitLogo.style.transform = `translateY(${(1 - progress) * 28}px) scale(${0.95 + progress * 0.05})`;
-    orbitLogo.style.filter = `brightness(${0.06 + progress * 0.94})`;
   }
 
   function updateImageReveals(){
@@ -86,6 +100,46 @@
     });
   }
 
+  function updateLogoTarget(event){
+    if (!logo) return;
+    const rect = logo.getBoundingClientRect();
+    const now = performance.now();
+    const elapsed = logoMotion.lastPointerTime ? Math.max(16, now - logoMotion.lastPointerTime) : 16;
+    const pointerX = event ? event.clientX : window.innerWidth / 2;
+    const pointerY = event ? event.clientY : window.innerHeight / 2;
+    const speed = Math.hypot(pointerX - logoMotion.pointerX, pointerY - logoMotion.pointerY) / elapsed;
+    const offsetX = (pointerX - (rect.left + rect.width / 2)) / Math.max(rect.width, 1);
+    const offsetY = (pointerY - (rect.top + rect.height / 2)) / Math.max(rect.height, 1);
+
+    logoMotion.targetX = Math.max(-34, Math.min(34, offsetX * 42));
+    logoMotion.targetY = Math.max(-20, Math.min(20, offsetY * 26));
+    logoMotion.targetRotation = Math.max(-8, Math.min(8, offsetX * 10));
+    logoMotion.wiggleAmount = Math.min(6, speed * 0.18);
+    logoMotion.pointerX = pointerX;
+    logoMotion.pointerY = pointerY;
+    logoMotion.lastPointerTime = now;
+  }
+
+  function updateLogoMotion(elapsed){
+    if (!logo) return;
+    const spring = 18;
+    const damping = Math.pow(0.001, elapsed / 1000);
+    logoMotion.velocityX += (logoMotion.targetX - logoMotion.x) * spring * elapsed / 1000;
+    logoMotion.velocityY += (logoMotion.targetY - logoMotion.y) * spring * elapsed / 1000;
+    logoMotion.rotationVelocity += (logoMotion.targetRotation - logoMotion.rotation) * spring * elapsed / 1000;
+    logoMotion.velocityX *= damping;
+    logoMotion.velocityY *= damping;
+    logoMotion.rotationVelocity *= damping;
+    logoMotion.x += logoMotion.velocityX * elapsed / 1000;
+    logoMotion.y += logoMotion.velocityY * elapsed / 1000;
+    logoMotion.rotation += logoMotion.rotationVelocity * elapsed / 1000;
+    logoMotion.wigglePhase += elapsed / 1000 * (8 + logoMotion.wiggleAmount * 2);
+    logoMotion.wiggleAmount *= Math.pow(0.12, elapsed / 1000);
+    logo.style.setProperty('--cursor-x', `${logoMotion.x}px`);
+    logo.style.setProperty('--cursor-y', `${logoMotion.y + Math.sin(logoMotion.wigglePhase) * logoMotion.wiggleAmount}px`);
+    logo.style.setProperty('--cursor-rotation', `${logoMotion.rotation + Math.sin(logoMotion.wigglePhase * 1.3) * logoMotion.wiggleAmount}deg`);
+  }
+
   const orbitState = { pointerX: 0.5, pointerY: 0.5, lastTime: 0, particles: [] };
 
   function createOrbitDots(){
@@ -133,6 +187,13 @@
     requestAnimationFrame(animateOrbit);
   }
 
+  function animateLogo(time){
+    const elapsed = logoMotion.lastFrameTime ? Math.min(32, time - logoMotion.lastFrameTime) : 0;
+    logoMotion.lastFrameTime = time;
+    updateLogoMotion(elapsed);
+    requestAnimationFrame(animateLogo);
+  }
+
   window.addEventListener('scroll', () => {
     updateHeroReveal();
     updateBufferReveal();
@@ -145,11 +206,16 @@
   window.addEventListener('pointermove', (event) => {
     orbitState.pointerX = event.clientX / window.innerWidth;
     orbitState.pointerY = event.clientY / window.innerHeight;
+    updateLogoTarget(event);
     updateSprites(event);
   }, { passive: true });
   window.addEventListener('pointerleave', () => {
     orbitState.pointerX = 0.5;
     orbitState.pointerY = 0.5;
+    logoMotion.targetX = 0;
+    logoMotion.targetY = 0;
+    logoMotion.targetRotation = 0;
+    logoMotion.wiggleAmount = 0;
     updateSprites(null);
   }, { passive: true });
 
@@ -158,6 +224,8 @@
   updateHeroReveal();
   updateBufferReveal();
   updateImageReveals();
+  updateLogoTarget(null);
   updateSprites(null);
+  requestAnimationFrame(animateLogo);
   requestAnimationFrame(animateOrbit);
 })();
