@@ -1,6 +1,7 @@
 (() => {
   const hero = document.querySelector('.hero');
   const logo = document.getElementById('heroLogo');
+  const logoStage = logo ? logo.closest('.logo-stage') : null;
   const spriteField = document.querySelector('.sprite-field');
   const orbitField = document.querySelector('.orbit-field');
   const buffer = document.querySelector('.cbuffer');
@@ -9,6 +10,7 @@
     targetX: 0,
     targetY: 0,
     targetRotation: 0,
+    targetStretch: 1,
     x: 0,
     y: 0,
     rotation: 0,
@@ -102,18 +104,30 @@
 
   function updateLogoTarget(event){
     if (!logo) return;
-    const rect = logo.getBoundingClientRect();
+    const rect = (logoStage || logo).getBoundingClientRect();
     const now = performance.now();
     const elapsed = logoMotion.lastPointerTime ? Math.max(16, now - logoMotion.lastPointerTime) : 16;
     const pointerX = event ? event.clientX : window.innerWidth / 2;
     const pointerY = event ? event.clientY : window.innerHeight / 2;
     const speed = Math.hypot(pointerX - logoMotion.pointerX, pointerY - logoMotion.pointerY) / elapsed;
-    const offsetX = (pointerX - (rect.left + rect.width / 2)) / Math.max(rect.width, 1);
-    const offsetY = (pointerY - (rect.top + rect.height / 2)) / Math.max(rect.height, 1);
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const distanceX = pointerX - centerX;
+    const distanceY = pointerY - centerY;
+    const distance = Math.hypot(distanceX, distanceY);
+    const nearRadius = Math.max(140, Math.min(window.innerWidth, window.innerHeight) * 0.3);
+    const farRadius = Math.max(nearRadius + 1, Math.min(window.innerWidth, window.innerHeight) * 0.8);
+    const nearForce = Math.max(0, 1 - distance / nearRadius);
+    const farForce = Math.max(0, Math.min(1, (distance - nearRadius) / (farRadius - nearRadius)));
+    const directionX = distance ? distanceX / distance : 0;
+    const directionY = distance ? distanceY / distance : 0;
+    const force = farForce * 0.65 - nearForce * 1.35;
+    const speedStretch = Math.min(0.12, speed * 0.008);
 
-    logoMotion.targetX = Math.max(-34, Math.min(34, offsetX * 42));
-    logoMotion.targetY = Math.max(-20, Math.min(20, offsetY * 26));
-    logoMotion.targetRotation = Math.max(-8, Math.min(8, offsetX * 10));
+    logoMotion.targetX = Math.max(-76, Math.min(76, directionX * force * 150));
+    logoMotion.targetY = Math.max(-58, Math.min(58, directionY * force * 112));
+    logoMotion.targetRotation = Math.max(-16, Math.min(16, directionX * force * 24));
+    logoMotion.targetStretch = 1 + speedStretch;
     logoMotion.wiggleAmount = Math.min(6, speed * 0.18);
     logoMotion.pointerX = pointerX;
     logoMotion.pointerY = pointerY;
@@ -127,6 +141,7 @@
     logoMotion.velocityX += (logoMotion.targetX - logoMotion.x) * spring * elapsed / 1000;
     logoMotion.velocityY += (logoMotion.targetY - logoMotion.y) * spring * elapsed / 1000;
     logoMotion.rotationVelocity += (logoMotion.targetRotation - logoMotion.rotation) * spring * elapsed / 1000;
+    logoMotion.targetStretch += (1 - logoMotion.targetStretch) * Math.min(1, elapsed / 180);
     logoMotion.velocityX *= damping;
     logoMotion.velocityY *= damping;
     logoMotion.rotationVelocity *= damping;
@@ -138,6 +153,7 @@
     logo.style.setProperty('--cursor-x', `${logoMotion.x}px`);
     logo.style.setProperty('--cursor-y', `${logoMotion.y + Math.sin(logoMotion.wigglePhase) * logoMotion.wiggleAmount}px`);
     logo.style.setProperty('--cursor-rotation', `${logoMotion.rotation + Math.sin(logoMotion.wigglePhase * 1.3) * logoMotion.wiggleAmount}deg`);
+    logo.style.setProperty('--cursor-stretch', String(logoMotion.targetStretch));
   }
 
   const orbitState = { pointerX: 0.5, pointerY: 0.5, lastTime: 0, particles: [] };
