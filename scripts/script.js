@@ -6,6 +6,7 @@
   const orbitField = document.querySelector('.orbit-field');
   const buffer = document.querySelector('.cbuffer');
   const revealSections = document.querySelectorAll('.image-reveal');
+  const logoPieces = [];
   const logoMotion = {
     targetX: 0,
     targetY: 0,
@@ -24,6 +25,55 @@
     wigglePhase: 0,
     wiggleAmount: 0,
   };
+
+  async function initializeLogoMaterial(){
+    if (!logo) return;
+    const response = await fetch('assets/vyomia-qualia-logo.svg');
+    if (!response.ok) return;
+    const source = new DOMParser().parseFromString(await response.text(), 'image/svg+xml');
+    const sourceRoot = source.documentElement;
+    logo.innerHTML = sourceRoot.innerHTML;
+    const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+    logo.prepend(defs);
+    logo.querySelectorAll('path').forEach((path, index) => {
+      const filter = document.createElementNS('http://www.w3.org/2000/svg', 'filter');
+      const turbulence = document.createElementNS('http://www.w3.org/2000/svg', 'feTurbulence');
+      const displacement = document.createElementNS('http://www.w3.org/2000/svg', 'feDisplacementMap');
+      filter.id = `logo-brittle-${index}`;
+      filter.setAttribute('x', '-20%');
+      filter.setAttribute('y', '-20%');
+      filter.setAttribute('width', '140%');
+      filter.setAttribute('height', '140%');
+      turbulence.setAttribute('type', 'fractalNoise');
+      turbulence.setAttribute('baseFrequency', '0.012 0.08');
+      turbulence.setAttribute('numOctaves', '2');
+      turbulence.setAttribute('seed', String(index + 7));
+      turbulence.setAttribute('result', 'clothNoise');
+      displacement.setAttribute('in', 'SourceGraphic');
+      displacement.setAttribute('in2', 'clothNoise');
+      displacement.setAttribute('scale', '0');
+      filter.append(turbulence, displacement);
+      defs.appendChild(filter);
+      path.setAttribute('filter', `url(#${filter.id})`);
+      logoPieces.push({
+        path,
+        displacement,
+        center: null,
+        brittle: 0,
+        target: 0,
+        x: 0,
+        y: 0,
+        rotation: 0,
+        velocityX: 0,
+        velocityY: 0,
+        rotationVelocity: 0,
+      });
+    });
+    logoPieces.forEach((piece) => {
+      const bounds = piece.path.getBBox();
+      piece.center = { x: bounds.x + bounds.width / 2, y: bounds.y + bounds.height / 2 };
+    });
+  }
 
   function updateHeroReveal(){
     if (!hero || !logo) return;
@@ -154,6 +204,45 @@
     logo.style.setProperty('--cursor-y', `${logoMotion.y + Math.sin(logoMotion.wigglePhase) * logoMotion.wiggleAmount}px`);
     logo.style.setProperty('--cursor-rotation', `${logoMotion.rotation + Math.sin(logoMotion.wigglePhase * 1.3) * logoMotion.wiggleAmount}deg`);
     logo.style.setProperty('--cursor-stretch', String(logoMotion.targetStretch));
+    updateLogoMaterial(elapsed);
+  }
+
+  function updateLogoMaterial(elapsed){
+    if (!logoPieces.length || !logo.getScreenCTM()) return;
+    const point = new DOMPoint(logoMotion.pointerX, logoMotion.pointerY).matrixTransform(logo.getScreenCTM().inverse());
+    logoPieces.forEach((piece) => {
+      const distance = Math.hypot(point.x - piece.center.x, point.y - piece.center.y);
+      const distanceInPixels = distance * logo.getBoundingClientRect().width / 8000;
+      const threshold = 6;
+      piece.target = Math.max(0, Math.min(1, (distanceInPixels - threshold) / 110));
+      piece.target = Math.max(piece.target, Math.min(1, logoMotion.wiggleAmount / 6) * 0.18);
+      piece.brittle += (piece.target - piece.brittle) * Math.min(1, elapsed / 140);
+      piece.displacement.setAttribute('scale', String(piece.brittle * 180));
+
+      const directionX = distance ? (piece.center.x - point.x) / distance : 0;
+      const directionY = distance ? (piece.center.y - point.y) / distance : 0;
+      const proximity = Math.max(0, 1 - distanceInPixels / 180);
+      const attraction = Math.min(1, distanceInPixels / 420) * 0.28;
+      const repulsion = proximity * 1.2;
+      const force = attraction - repulsion;
+      const targetX = Math.max(-180, Math.min(180, directionX * force * 360));
+      const targetY = Math.max(-130, Math.min(130, directionY * force * 260));
+      const targetRotation = Math.max(-14, Math.min(14, directionX * force * 28));
+      const spring = 22;
+      piece.velocityX += (targetX - piece.x) * spring * elapsed / 1000;
+      piece.velocityY += (targetY - piece.y) * spring * elapsed / 1000;
+      piece.rotationVelocity += (targetRotation - piece.rotation) * spring * elapsed / 1000;
+      piece.velocityX *= 0.86;
+      piece.velocityY *= 0.86;
+      piece.rotationVelocity *= 0.86;
+      piece.x += piece.velocityX * elapsed / 1000;
+      piece.y += piece.velocityY * elapsed / 1000;
+      piece.rotation += piece.rotationVelocity * elapsed / 1000;
+      const speedJitter = logoMotion.wiggleAmount * 0.7;
+      const jitterX = Math.sin(logoMotion.wigglePhase + piece.center.x) * speedJitter;
+      const jitterY = Math.cos(logoMotion.wigglePhase + piece.center.y) * speedJitter;
+      piece.path.setAttribute('transform', `translate(${piece.x + jitterX} ${piece.y + jitterY}) rotate(${piece.rotation} ${piece.center.x} ${piece.center.y})`);
+    });
   }
 
   const orbitState = { pointerX: 0.5, pointerY: 0.5, lastTime: 0, particles: [] };
@@ -218,6 +307,10 @@
   window.addEventListener('resize', () => {
     updateHeroReveal();
     updateBufferReveal();
+    logoPieces.forEach((piece) => {
+      const bounds = piece.path.getBBox();
+      piece.center = { x: bounds.x + bounds.width / 2, y: bounds.y + bounds.height / 2 };
+    });
   });
   window.addEventListener('pointermove', (event) => {
     orbitState.pointerX = event.clientX / window.innerWidth;
@@ -242,6 +335,7 @@
   updateImageReveals();
   updateLogoTarget(null);
   updateSprites(null);
+  initializeLogoMaterial();
   requestAnimationFrame(animateLogo);
   requestAnimationFrame(animateOrbit);
 })();
